@@ -87,7 +87,7 @@ Process Monitor watches the programs running on the computer. It looks for progr
 - **Where programs run from.** Programs running from folders where software doesn't normally live, such as Temp, AppData, and Downloads.
 - **Parent-child chains.** Which program started which, with suspicious chains called out, such as an Office app, PDF reader, or script host starting a command shell, or PowerShell running encoded commands.
 - **Misused Windows tools.** Built-in tools that attackers like to borrow (known as LOLBins), such as certutil, mshta, regsvr32, bitsadmin, and wscript.
-- **Look-alikes.** Programs using the name of a Windows system process while running from the wrong folder, extra copies of processes that should only run once, such as the Windows login process, and service hosts with unusual parents.
+- **Look-alikes.** Programs using the name of a Windows system process while running from the wrong folder, extra copies of processes that should only run once, such as the Local Security Authority process (lsass), which handles sign-ins, and service hosts with unusual parents.
 - **Who's behind a listener.** Network Monitor covers connections. When it flags a listener, Process Monitor identifies the program behind it and what started it.
 - **Current status.** The monitored PC runs Windows, and the checks run without admin rights. See Safeguards for what that hides.
 
@@ -103,7 +103,7 @@ Process Monitor watches the programs running on the computer. It looks for progr
 
 | Severity | Examples |
 |----------|----------|
-| 🟠 High | A Windows system process name running from outside its normal folder, more than one copy of the Windows login process, encoded or hidden PowerShell, an Office app, PDF reader, or script host starting a shell, or rundll32 loading a URL or a DLL from a user folder. |
+| 🟠 High | A Windows system process name running from outside its normal folder, more than one copy of the Local Security Authority process (lsass), encoded or hidden PowerShell, an Office app, PDF reader, or script host starting a shell, or rundll32 loading a URL or a DLL from a user folder. |
 | 🟠 Medium | Any program running from Temp, Downloads, Public, or the Recycle Bin, a built-in Windows tool attackers misuse (LOLBin) running, or a service host with an unusual parent. For example, an unverified program started from Downloads that unpacked itself into a temporary folder and runs from there. |
 | 🟡 Low | A script running with no window from Downloads that started shortly after login, which points to an autostart entry. |
 | ✅ Info | Well-known benign apps added on the first run, tools the owner confirmed, and the team's own commands. |
@@ -194,7 +194,7 @@ Startup Monitor watches every common way a program can make itself start again a
 
 | Severity | Examples |
 |----------|----------|
-| 🟠 High | Any new startup entry that launches PowerShell, Python, Node, npx, uvx, or a program from a user-writable folder, such as a hidden, unsigned interpreter from Downloads, or any entry that points to one of the team's decoys. |
+| 🟠 High | Any new startup entry that launches PowerShell, Python, Node, npx, uvx, or a program from a user-writable folder, such as a hidden interpreter running an unsigned script from Downloads, or any entry that points to one of the team's decoys. |
 | 🟠 Medium | Browser extensions with high-risk permissions, such as debugger access, proxy and extension management, or access to every site. |
 | 🟡 Low | A service left set to start automatically after its program was removed, unsigned programs in startup entries, or an app that spreads itself across several launch points. |
 | ✅ Info | Normal installer behavior, recently updated entries that are all vendor-signed, and default Windows entries that check out. |
@@ -245,7 +245,7 @@ Windows Log Monitor reads the computer's security and system logs. It looks for 
 | 🔴 Critical | Security or System log cleared, Defender real-time protection turned off by something other than the owner, or a new admin account nobody created. |
 | 🟠 High | Remote logons from unknown addresses, a burst of failed logons followed by a success, a new unsigned service or scheduled task running from a user folder, Defender exclusions added unexpectedly, or a script block with download-and-run or antivirus-bypass code. |
 | 🟠 Medium | A new local account or group change that the owner doesn't recognize, or a Defender detection that was blocked but points to a real infection attempt. |
-| 🟡 Low | Gaps in what can be seen (a log that can't be read, script logging turned off), hidden PowerShell sessions most likely from developer tools, or programs that start hidden from odd folders. |
+| 🟡 Low | Gaps in what can be seen (a log that can't be read, script logging turned off), non-interactive PowerShell sessions most likely from developer tools, or programs that start hidden from odd folders. |
 | ✅ Info | Signed vendor service installs, Defender signature updates and settings syncs, and routine developer activity. |
 
 Every finding includes the evidence (event ID, time, account, and source) and a note on how likely it is to be a false positive.
@@ -290,8 +290,8 @@ File Change Monitor watches important files and the folders where unwanted progr
 
 | Severity | Examples |
 |----------|----------|
-| 🟠 Medium | Unsigned installers downloaded from the internet sitting in Downloads, or a startup script that runs code from Downloads with no window. |
-| 🟡 Low | Unsigned global keyboard and mouse hook libraries in Temp, an unsigned installed AI assistant with computer-use features, or an unsigned app unpacked into Temp from a signed installer. |
+| 🟠 Medium | Unsigned installers downloaded from the internet sitting in Downloads. |
+| 🟡 Low | Unsigned global keyboard and mouse hook libraries in Temp, or an unsigned app unpacked into Temp from a signed installer. On the first run it rated two findings Low-Medium, between the two levels: a startup script that runs code from Downloads with no window, and an unsigned installed AI assistant with computer-use features. |
 | ✅ Info | Hosts file entries written by a container tool, no SSH server and no authorized keys, no PowerShell profiles, valid signatures on system programs and drivers, no ransomware signs, and the team's own command scripts in Temp. |
 
 Its instructions don't define High or Critical examples, and none came up in the first baseline, so none are listed. IDS Commander sets the final severity when it combines findings into an incident. Every finding includes the evidence (file, old and new fingerprint, times, and signer) and a note on how likely it is to be a false positive.
@@ -563,7 +563,7 @@ Once setup is done, the team mostly runs itself. Here's what to expect day to da
 
 ## Sample findings
 
-To see what the team's reports actually look like, read [SAMPLE_FINDINGS.md](SAMPLE_FINDINGS.md). It walks through real, redacted findings from the team's first run on the owner's PC: a Python script listening on every network interface that was fixed with the owner's approval, a clean bill of health for Defender and remote access, PowerShell activity from AI coding tools that was ruled benign, and browser extensions with broad permissions that are still under review.
+To see what the team's reports actually look like, read [SAMPLE_FINDINGS.md](SAMPLE_FINDINGS.md). It starts with the one summary the owner receives from the IDS Commander, then shows each specialist's findings in the four-part format (severity, evidence, false-positive assessment, and response command). All of them are real, redacted findings from the team's first run on the owner's PC. Highlights include a Python script listening on every network interface, fixed with the owner's approval, a clean bill of health for Defender and remote access, and PowerShell activity that most likely came from AI coding tools.
 
 ## Limitations
 
