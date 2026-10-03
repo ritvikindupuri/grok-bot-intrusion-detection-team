@@ -11,23 +11,23 @@ The summary comes first below, because that is what the owner actually reads. Th
 
 ## What the owner receives: the IDS Commander's summary
 
-On the first run, the owner got the findings as a series of short updates while each bot finished, plus a message confirming each fix. No single summary went out that day. The summary below gathers the first run's real findings into the format a daily sweep summary uses.
+On the first run, the findings arrived as short updates while each bot finished, some posted by the bots in the room and some sent to the owner, plus a message confirming each fix. No single summary went out that day. The summary below gathers the first run's real findings into the format a daily sweep summary uses.
 
 ### The actual messages from the first run
 
-These are two of the real messages the IDS Commander sent the owner on September 29. The text is exactly as sent, with the owner's app name, port, process ID, and backup file name blacked out. The bots still had their original names then: Persistence Hunter is now Startup Monitor, Network Watch is now Network Monitor, File Integrity Monitor is now File Change Monitor, and AI Agent Watchdog is now AI Agent Monitor.
-
-**First findings update, 9:41 AM**
+These are real screenshots from the owner's phone, taken in the Daily PC Scans room on September 29. The owner's name, the app's name, its port, and a file date are blacked out. The bots still had their original names then: Persistence Hunter is now Startup Monitor, Network Watch is now Network Monitor, Log Analyst is now Windows Log Monitor, and File Integrity Monitor is now File Change Monitor.
 
 <p align="center">
-  <img src="docs/ids-commander-first-findings.png" alt="The IDS Commander's first findings update to the owner" width="850">
+  <img src="docs/real-startup-monitor-room-post.png" alt="Persistence Hunter's first baseline results in the Daily PC Scans room" width="380">
 </p>
-
-**Fix confirmation, 9:45 AM, after the owner approved the fixes**
+<p align="center"><b>Persistence Hunter (now Startup Monitor) posting its first baseline results to the room</b></p>
 
 <p align="center">
-  <img src="docs/ids-commander-fix-confirmed.png" alt="The IDS Commander confirming the approved fixes" width="850">
+  <img src="docs/real-shield-exposure-message.png" alt="A first-run update about the exposed script and the PowerShell sessions" width="380">
 </p>
+<p align="center"><b>A first-run update rating the exposed script Medium and the PowerShell sessions Low</b></p>
+
+The screenshots use the first-day wording "hidden PowerShell sessions"; the later review found they were non-interactive sessions with commands piped in.
 
 ### The summary format
 
