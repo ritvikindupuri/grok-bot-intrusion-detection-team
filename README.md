@@ -85,8 +85,8 @@ Process Monitor watches the programs running on the computer. It looks for progr
 #### What it watches
 
 - **Where programs run from.** Programs running from folders where software doesn't normally live, such as Temp, AppData, and Downloads.
-- **Parent-child chains.** Which program started which, with suspicious chains called out, such as an Office app or a browser starting a command shell, or PowerShell running encoded commands.
-- **Misused Windows tools.** Built-in tools that attackers like to borrow (known as LOLBins), such as certutil, mshta, rundll32, regsvr32, and bitsadmin.
+- **Parent-child chains.** Which program started which, with suspicious chains called out, such as an Office app, PDF reader, or script host starting a command shell, or PowerShell running encoded commands.
+- **Misused Windows tools.** Built-in tools that attackers like to borrow (known as LOLBins), such as certutil, mshta, regsvr32, bitsadmin, and wscript.
 - **Look-alikes.** Programs using the name of a Windows system process while running from the wrong folder, extra copies of processes that should only run once, such as the Windows login process, and service hosts with unusual parents.
 - **Who's behind a listener.** Network Monitor covers connections. When it flags a listener, Process Monitor identifies the program behind it and what started it.
 - **Current status.** The monitored PC runs Windows, and the checks run without admin rights. See Safeguards for what that hides.
@@ -97,7 +97,7 @@ Process Monitor watches the programs running on the computer. It looks for progr
 2. **Save the baseline.** A summary is saved on the Grok Bot computer, not on the monitored PC: how many copies of each program normally run, which program names go with which paths, and which parent-child pairs are normal.
 3. **Compare.** Each check collects the same data again and looks for new program names, known names running from new paths, new parent-child pairs, and any of the patterns listed above.
 4. **Report only the differences.** Changes get a severity, the evidence, and a note on how likely they are to be false alarms. Programs the owner already confirmed as expected aren't reported again unless they change.
-5. **Update the baseline only after approval.** A program joins the baseline only after the owner confirms it's expected. On the first run, it judged a local AI model server, AI coding tools' helper processes, a VPN client, hardware vendor utilities, and antivirus as benign and added them. The two items it flagged are waiting on the owner.
+5. **Update the baseline only after approval.** Flagged programs join the baseline only after the owner confirms they're expected. Well-known benign apps rated Info are added on the first run for the owner to review. On the original PC, that meant a local AI model server, AI coding tools' helper processes, a VPN client, hardware vendor utilities, and antivirus. The two items it flagged are waiting on the owner.
 
 #### Severity rules
 
@@ -106,13 +106,13 @@ Process Monitor watches the programs running on the computer. It looks for progr
 | 🟠 High | A Windows system process name running from outside its normal folder, more than one copy of the Windows login process, encoded or hidden PowerShell, an Office app or script host starting a shell, or rundll32 loading a URL or a DLL from a user folder. |
 | 🟠 Medium | Any program running from Temp, Downloads, Public, or the Recycle Bin, a built-in Windows tool attackers misuse (LOLBin) running, or a service host with an unusual parent. For example, an unverified program started from Downloads that unpacked itself into a temporary folder and runs from there. |
 | 🟡 Low | A script running with no window from Downloads that started shortly after login, which points to an autostart entry. |
-| ✅ Info | Known tools the owner confirmed and the team's own commands. |
+| ✅ Info | Well-known benign apps added on the first run, tools the owner confirmed, and the team's own commands. |
 
 Its instructions don't define Critical examples, so none are listed. IDS Commander sets the final severity when it combines findings into an incident. Every finding includes the evidence (program path, command line, parent, and start time) and a note on how likely it is to be a false positive.
 
 #### Schedule
 
-- **Daily sweep.** Process Monitor runs when IDS Commander calls on it during the daily 9:27 AM ET sweep, and whenever the owner asks for a check. It has no separate schedule of its own.
+- **Daily sweep.** Process Monitor runs when IDS Commander calls on it during the daily sweep, and whenever the owner asks for a check. It has no separate schedule of its own.
 - **Follow-ups for teammates.** When another team member flags something, such as a new listener or a new autostart entry, Process Monitor checks which program is behind it and what started it.
 - **Findings go to IDS Commander.** High and Critical findings are sent right away. Everything else goes in the regular report, and IDS Commander decides what reaches the owner.
 
@@ -156,8 +156,8 @@ Network Monitor watches the computer's network activity. It looks at which progr
 
 #### Schedule
 
-- **Daily sweep.** Network Monitor runs when IDS Commander calls on it during the daily 9:27 AM ET sweep, and whenever the owner asks for a check.
-- **Its own rechecks.** It also runs its own recheck three times a day, at 9:39 AM, 2:39 PM, and 8:39 PM ET. Each recheck compares the PC with the baseline and reports any change to IDS Commander. If the PC is offline, the recheck stops without retrying, logs a skipped run, sends IDS Commander a short note, and leaves the baseline alone.
+- **Daily sweep.** Network Monitor runs when IDS Commander calls on it during the daily sweep, and whenever the owner asks for a check.
+- **Its own rechecks.** It also runs its own recheck three times a day (9:39 AM, 2:39 PM, and 8:39 PM ET on the original PC). An imported copy asks its new owner when to run it. Each recheck compares the PC with the baseline and reports any change to IDS Commander. If the PC is offline, the recheck stops without retrying, logs a skipped run, sends IDS Commander a short note, and leaves the baseline alone.
 - **Follow-ups for teammates.** When another team member flags something with a time attached, Network Monitor checks what was connecting or listening at that time.
 - **Findings go to IDS Commander.** Every finding goes to IDS Commander, and High and Critical findings are sent right away. During its own rechecks, Network Monitor also messages the owner directly about Medium and higher findings, with the suggested fix command.
 
@@ -203,7 +203,7 @@ Its instructions don't define Critical examples, so none are listed. IDS Command
 
 #### Schedule
 
-- **Daily sweep.** Startup Monitor runs when IDS Commander calls on it during the daily 9:27 AM ET sweep, and whenever the owner asks for a check.
+- **Daily sweep.** Startup Monitor runs when IDS Commander calls on it during the daily sweep, and whenever the owner asks for a check.
 - **Its own re-scan.** It also runs its own weekly re-scan, on Tuesdays at 9:39 AM ET, and reports changes to IDS Commander. An imported copy asks its new owner to pick daily or weekly and a time.
 - **Follow-ups for teammates.** When another team member finds a program that seems to start by itself, Startup Monitor looks for the launch point behind it.
 - **Findings go to IDS Commander.** High and Critical findings are sent right away. Everything else goes in the regular report, and IDS Commander decides what reaches the owner.
@@ -252,7 +252,7 @@ Every finding includes the evidence (event ID, time, account, and source) and a 
 
 #### Schedule
 
-- **Daily sweep.** Windows Log Monitor runs when IDS Commander calls on it during the daily 9:27 AM ET sweep, and whenever the owner asks for a check. It has no separate schedule of its own.
+- **Daily sweep.** Windows Log Monitor runs when IDS Commander calls on it during the daily sweep, and whenever the owner asks for a check. It has no separate schedule of its own.
 - **Only what's new.** Each check reviews the time since the last checkpoint, so nothing is reviewed twice and nothing is skipped.
 - **Follow-ups for teammates.** When another team member flags something with a time attached, Windows Log Monitor checks the logs around that moment for related events.
 - **Findings go to IDS Commander.** High and Critical findings are sent right away. Everything else goes in the regular report, and IDS Commander decides what reaches the owner.
@@ -298,7 +298,7 @@ Its instructions don't define High or Critical examples, and none came up in the
 
 #### Schedule
 
-- **Daily sweep.** File Change Monitor runs when IDS Commander calls on it during the daily 9:27 AM ET sweep, and whenever the owner asks for a check.
+- **Daily sweep.** File Change Monitor runs when IDS Commander calls on it during the daily sweep, and whenever the owner asks for a check.
 - **Its own rescans.** It also runs its own rescan every day at 9:40 AM, 1:40 PM, 5:40 PM, and 9:40 PM ET. Each rescan compares the PC with the baseline and reports changes to IDS Commander. If the PC is offline, the rescan is skipped and logged. An imported copy asks its new owner when to run it.
 - **Follow-ups for teammates.** When another team member flags a program or script, File Change Monitor can supply its fingerprint, signature, and download source.
 - **Findings go to IDS Commander.** High and Critical findings are sent right away, and it also messages the owner directly about them. Everything else is sent to IDS Commander as a non-urgent report. When nothing changed, it stays silent.
@@ -339,7 +339,7 @@ It uses the team's five levels, from Info to Critical. Its instructions don't se
 
 #### Schedule
 
-- **Daily sweep.** AI Agent Monitor runs when IDS Commander calls on it during the daily 9:27 AM ET sweep, and whenever the owner asks for a check. It has no separate schedule of its own.
+- **Daily sweep.** AI Agent Monitor runs when IDS Commander calls on it during the daily sweep, and whenever the owner asks for a check. It has no separate schedule of its own.
 - **Follow-ups for teammates.** When Decoy Monitor sees a decoy touched by an agent process, the two compare notes.
 - **Findings go to IDS Commander.** High and Critical findings are sent right away. Everything else goes in the regular report, and IDS Commander decides what reaches the owner.
 
@@ -382,7 +382,7 @@ Its instructions don't define Critical, Medium, or Low examples, so none are lis
 
 #### Schedule
 
-- **Daily sweep.** Decoy Monitor always goes last in IDS Commander's daily 9:27 AM ET sweep, after the other specialists have finished. It has no separate schedule of its own.
+- **Daily sweep.** Decoy Monitor always goes last in IDS Commander's daily sweep, after the other specialists have finished. On the original team it has no separate schedule of its own. An imported copy offers to set up its own daily decoy check. If your IDS Commander already runs the daily sweep, you can decline so the decoys aren't checked twice.
 - **After an alert.** When a Canarytoken alert arrives or a touch is suspected, it runs an extra check on request.
 - **Findings go to IDS Commander.** Any touch is sent right away, and IDS Commander passes it to the owner immediately. Canarytoken alert emails go straight to the owner.
 
@@ -406,11 +406,21 @@ Its instructions don't define Critical, Medium, or Low examples, so none are lis
 
 ## Set it up in your own Grok Bot
 
-You need a Grok Bot account, a Windows PC with the Grok Bot desktop app, and (for the Decoy Monitor) free tokens from canarytokens.org, which needs no account, just an email address for alerts. Setup takes four steps.
+**What you need**
 
-### 1. Import the eight agents
+- A Grok Bot account
+- A Windows PC you can sit at, since every command needs your approval on it
+- An email address for decoy alerts (the Decoy Monitor uses free tokens from canarytokens.org, which needs no account)
 
-Each agent is published as a public Grok Bot template. Open each link and import it into your Grok Bot. A template brings the agent's name, icon, role, rules, and finding format with it, so there's nothing to type in by hand. None of the templates point at any particular PC: the first time you open each agent's chat, it asks which computer it should watch.
+Setup takes five steps. Do them in order.
+
+### 1. Connect your Windows PC
+
+Install the Grok Bot desktop app on the PC and sign in with your Grok Bot account, so the PC is registered as one of your computers. The agents use this connection to run read-only commands on the PC. Every command shows an approval prompt on the PC, and nothing runs until you approve it. You only connect the PC once, and all eight agents share the connection.
+
+### 2. Import the eight agents
+
+Each agent is published as a public Grok Bot template. Open each link below and import it into your Grok Bot. A template brings the agent's name, icon, role, rules, and finding format with it, so there's nothing to type in by hand. None of the templates point at any particular PC. Each agent asks which computer to watch the first time you open its chat.
 
 | Agent | What it does | Template |
 |-------|--------------|----------|
@@ -422,6 +432,8 @@ Each agent is published as a public Grok Bot template. Open each link and import
 | File Change Monitor | Keeps hash baselines of important files and folders. | [Import](https://x.ai/bot/hx5ACy3v6cN9dwyOje57y) |
 | AI Agent Monitor | Guards MCP configs, agent rules files, extensions, and AI keys. | [Import](https://x.ai/bot/vyJij4Ld7g4egW8CAxA2f) |
 | Decoy Monitor | Plants and watches approved decoys. | [Import](https://x.ai/bot/mgWu-HRKIWnUjI5B_TKRh) |
+
+Import all eight before you continue.
 
 <details>
 <summary><b>Prefer to build the team by hand instead of importing?</b></summary>
@@ -467,23 +479,43 @@ Then send the IDS Commander these standing rules and ask it to remember them and
 
 </details>
 
-### 2. Connect your Windows PC
+### 3. Set up the IDS Commander
 
-Install the Grok Bot desktop app on the PC and register it with your Grok Bot account. The agents use this connection to run read-only commands on the PC. Every command shows an approval prompt on the PC, and nothing runs until you approve it. You only connect the PC once; all eight agents share the connection.
+Open the IDS Commander's chat. It starts with a few setup questions, one at a time:
 
-### 3. Set up the IDS Commander and the rooms
+1. Which PC to watch. Pick the PC you connected in step 1.
+2. Whether you already have the specialists. Say yes, since you imported them in step 2.
+3. What time the daily check should run, and whether it includes weekends.
+4. How much say you want on fixes: let it decide (you still approve every command on the PC), or ask you about each one first.
 
-Open the IDS Commander's chat and answer its first-run setup questions. It asks, one at a time, which PC to watch, whether you already have the specialists, what time the daily check should run, and how much say you want on fixes. It saves your answers and creates the daily sweep routine.
+It saves your answers and creates the daily sweep routine.
 
-Grok Bot rooms hold at most six members, so the team uses two rooms. The IDS Commander offers to create them during setup. If it doesn't, ask it with messages like these:
+### 4. Create the two rooms
+
+Grok Bot rooms hold at most six members, so the team uses two rooms. The IDS Commander offers to create them during setup. If it doesn't, send it these two messages:
 
 > Create a room named "Daily PC Scans" with Process Monitor, Network Monitor, Startup Monitor, Windows Log Monitor, and File Change Monitor. IDS Commander runs the daily sweep here: each scanner checks for changes against its baseline in turn and reports findings with severity, evidence, and a false-positive assessment.
 
 > Create a room named "Intrusion Investigations" with AI Agent Monitor, Decoy Monitor, Process Monitor, Network Monitor, and Startup Monitor. IDS Commander uses this room to investigate incidents, AI-agent findings, and decoy alerts.
 
-### 4. Take the first baselines
+### 5. Set up each specialist and take the first baselines
 
-Open each specialist's chat once. Each one asks a short set of setup questions the first time, such as which PC to watch and what to call its IDS lead. Network Monitor, Startup Monitor, and File Change Monitor also ask when to run their own rechecks (File Change Monitor also asks which folders matter most), and the Decoy Monitor asks which email should get decoy alerts and whether you want it to propose a starter set of decoys. Give the same PC you gave the IDS Commander, and name the IDS Commander as its lead. No specialist scans until you say it's ready. Then ask each specialist, one at a time, to take its first baseline. You'll approve each command on the PC as it runs. Review what each specialist flags, and tell it which items are normal so they're added to the baseline. When you're ready for decoys, ask the Decoy Monitor for a plan and approve it. Create the Canarytokens it lists on canarytokens.org with your alert email, and enter their values in its masked secret prompt, never in chat. It plants nothing until you approve the exact plan.
+Go through the specialists one at a time, in this order: Process Monitor, Network Monitor, Startup Monitor, Windows Log Monitor, File Change Monitor, AI Agent Monitor, then Decoy Monitor. For each one:
+
+1. **Open its chat and answer its setup questions.** Every specialist asks which PC to watch and what to call its IDS lead. Give the same PC as in step 3, and name the IDS Commander as its lead.
+   - Network Monitor, Startup Monitor, and File Change Monitor also ask when to run their own rechecks. File Change Monitor also asks which folders matter most to you.
+   - Decoy Monitor also asks which email should get decoy alerts and whether you want it to propose a starter set of decoys. If it offers its own daily check, you can decline, since the IDS Commander's sweep already covers it.
+   - If a specialist asks about decoys before you've set any up, answer "none yet". The Decoy Monitor shares its decoy list later.
+   - **Pick recheck times that don't overlap.** Leave at least 30 minutes between each specialist's recheck, and keep them clear of the daily sweep, so only one scan runs at a time.
+2. **Say yes when it asks "Ready for me to take the first baseline?"** No specialist scans until you say so. Say yes to only one specialist at a time, and wait for its summary before you start the next.
+3. **Approve the commands on the PC** as they appear.
+4. **Review what it flags.** Tell it which items are normal for your PC so they're added to the baseline and not reported again.
+
+Then move on to the next specialist. Running them one at a time keeps the approval prompts manageable.
+
+**Give the Windows Log Monitor access to the Security log.** Without admin rights, Windows won't let it read logons and account changes, and it reports those checks as not covered. To fix that, add your Windows account to the built-in Event Log Readers group, then sign out and back in. One way is to run `net localgroup "Event Log Readers" YOUR-USERNAME /add` in an administrator terminal, replacing `YOUR-USERNAME` with your Windows user name.
+
+**Decoys come last.** When you're ready, ask the Decoy Monitor for a decoy plan and approve it. Create the Canarytokens it lists on canarytokens.org using your alert email, then enter their values in the Decoy Monitor's masked secret prompt, never in chat. It plants nothing until you approve the exact plan. Once the decoys are in place, tell the other specialists where the Decoy Monitor keeps its decoy list, so their scans skip those files and don't trip them.
 
 Once every specialist has a baseline, the team is ready. Go to [How to use it](#how-to-use-it) to see how the daily routine works.
 
