@@ -559,7 +559,7 @@ Once setup is done, the team mostly runs itself. Here's what to expect day to da
 
    Or ask the IDS Commander to pass it along:
    > Have AI Agent Monitor re-check my MCP configs after the extension update.
-8. **If a Canarytokens alert email arrives,** tell the IDS Commander the token's memo (the note you typed when you created it) and when it fired. If you opened a decoy yourself, say so, so it isn't treated as an intruder. The Decoy Monitor runs an extra check, Process Monitor lists which programs that started before the touch are still running (one that already exited won't show up), Network Monitor checks connections and lookups of the decoy's domain, and Startup Monitor looks for new autostart entries from around that time. An alert that fires within a few minutes of your cloud-sync app syncing or previewing that folder may be a false alarm, and the Decoy Monitor will say so.
+8. **If a Canarytokens alert email arrives,** tell the IDS Commander the token's memo (the note you typed when you created it) and when it fired. If you opened a decoy yourself, say so, so it isn't treated as an intruder. The Decoy Monitor runs an extra check, Process Monitor lists which programs that started before the touch are still running (one that already exited won't show up), Network Monitor checks connections and lookups of the decoy's canary domain, if it has one, and Startup Monitor looks for new autostart entries from around that time. An alert that fires within a few minutes of your cloud-sync app syncing or previewing that folder may be a false alarm, and the Decoy Monitor will say so.
 
 ## Sample findings
 
