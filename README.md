@@ -406,23 +406,36 @@ Its instructions don't define Critical, Medium, or Low examples, so none are lis
 
 You need a Grok Bot account, a Windows PC with the Grok Bot desktop app, and (for the Decoy Monitor) a free Canarytokens account tied to your email. Setup takes four steps.
 
-### 1. Create the eight agents
+### 1. Import the eight agents
+
+Each agent is published as a public Grok Bot template. Open each link and import it into your Grok Bot. A template brings the agent's name, icon, role, rules, and finding format with it, so there's nothing to type in by hand. None of the templates point at any particular PC: the first time you open each agent's chat, it asks which computer it should watch.
+
+| Agent | What it does | Template |
+|-------|--------------|----------|
+| IDS Commander | Team lead. Runs the sweep, connects findings into incidents, and is the only agent that runs approved fixes. | [Import](https://x.ai/bot/OZ0yDXFEXa2543pqGmbhb) |
+| Process Monitor | Watches running processes and the binaries behind them. | [Import](https://x.ai/bot/9UK3ux3eODqZJL-Rm1lqq) |
+| Network Monitor | Watches listeners, connections, DNS, proxy, and firewall rules. | [Import](https://x.ai/bot/z2NwNu1KuAfWMIXmGc2v9) |
+| Startup Monitor | Watches every way a program can start itself. | [Import](https://x.ai/bot/NuZ12agHkr-wygHHFpKYS) |
+| Windows Log Monitor | Reads Windows event logs for signs of intrusion or tampering. | [Import](https://x.ai/bot/KQZUP7_xe3-G4P6xYt3bl) |
+| File Change Monitor | Keeps hash baselines of important files and folders. | [Import](https://x.ai/bot/hx5ACy3v6cN9dwyOje57y) |
+| AI Agent Monitor | Guards MCP configs, agent rules files, extensions, and AI keys. | [Import](https://x.ai/bot/vyJij4Ld7g4egW8CAxA2f) |
+| Decoy Monitor | Plants and watches approved decoys. | [Import](https://x.ai/bot/mgWu-HRKIWnUjI5B_TKRh) |
+
+<details>
+<summary><b>Prefer to build the team by hand instead of importing?</b></summary>
 
 Create one Grok Bot agent for each role below. Give each one its own icon shape and color so you can tell them apart at a glance, and keep red free for alerts.
 
-| Agent | What it does | Icon |
-|-------|--------------|------|
-| IDS Commander | Team lead. Runs the sweep, connects findings into incidents, and is the only agent that runs approved fixes. | Blue shield |
-| Process Monitor | Watches running processes and the binaries behind them. | Orange hexagon |
-| Network Monitor | Watches listeners, connections, DNS, proxy, and firewall rules. | Cyan cloud |
-| Startup Monitor | Watches every way a program can start itself. | Violet arch |
-| Windows Log Monitor | Reads Windows event logs for signs of intrusion or tampering. | Gray tablet |
-| File Change Monitor | Keeps hash baselines of important files and folders. | Green cylinder |
-| AI Agent Monitor | Guards MCP configs, agent rules files, extensions, and AI keys. | Magenta crystal |
-| Decoy Monitor | Plants and watches approved decoys. | Yellow gem |
-
-<details>
-<summary><b>Suggested descriptions for each agent</b></summary>
+| Agent | Icon |
+|-------|------|
+| IDS Commander | Blue shield |
+| Process Monitor | Orange hexagon |
+| Network Monitor | Cyan cloud |
+| Startup Monitor | Violet arch |
+| Windows Log Monitor | Gray tablet |
+| File Change Monitor | Green cylinder |
+| AI Agent Monitor | Magenta crystal |
+| Decoy Monitor | Yellow gem |
 
 Use these descriptions when you create the agents, then send the standing rules below.
 
@@ -458,17 +471,17 @@ Install the Grok Bot desktop app on the PC and register it with your Grok Bot ac
 
 ### 3. Set up the IDS Commander and the rooms
 
-Grok Bot rooms hold at most six members, so the team uses two rooms. Ask the IDS Commander to create them, using messages like these:
+Open the IDS Commander's chat and answer its first-run setup questions. It asks, one at a time, which PC to watch, whether you already have the specialists, what time the daily check should run, and how much say you want on fixes. It saves your answers and creates the daily sweep routine.
+
+Grok Bot rooms hold at most six members, so the team uses two rooms. The IDS Commander offers to create them during setup. If it doesn't, ask it with messages like these:
 
 > Create a room named "Daily PC Scans" with Process Monitor, Network Monitor, Startup Monitor, Windows Log Monitor, and File Change Monitor. IDS Commander runs the daily sweep here: each scanner checks for changes against its baseline in turn and reports findings with severity, evidence, and a false-positive assessment.
 
 > Create a room named "Intrusion Investigations" with AI Agent Monitor, Decoy Monitor, Process Monitor, Network Monitor, and Startup Monitor. IDS Commander uses this room to investigate incidents, AI-agent findings, and decoy alerts.
 
-Then ask the IDS Commander to schedule the daily sweep for 9:27 AM ET every day, weekends included, with the Decoy Monitor going last.
-
 ### 4. Take the first baselines
 
-Ask each specialist, one at a time, to take its first baseline. You'll approve each command on the PC as it runs. Review what each specialist flags, and tell it which items are normal so they're added to the baseline. When you're ready for decoys, ask the Decoy Monitor for a plan, review it, and approve it before anything is planted.
+Open each specialist's chat once. Each one asks a short set of setup questions the first time, such as which PC to watch and what to call its IDS lead. Give the same PC you gave the IDS Commander, and name the IDS Commander as its lead. Then ask each specialist, one at a time, to take its first baseline. You'll approve each command on the PC as it runs. Review what each specialist flags, and tell it which items are normal so they're added to the baseline. When you're ready for decoys, ask the Decoy Monitor for a plan, review it, and approve it before anything is planted.
 
 Once every specialist has a baseline, the team is ready. Go to [How to use it](#how-to-use-it) to see how the daily routine works.
 
