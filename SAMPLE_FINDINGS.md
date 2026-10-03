@@ -11,7 +11,25 @@ The summary comes first below, because that is what the owner actually reads. Th
 
 ## What the owner receives: the IDS Commander's summary
 
-The original message wasn't saved, so this is the same summary format rebuilt from the first run's real findings.
+On the first run, the owner got the findings as a series of short updates while each bot finished, plus a message confirming each fix. No single summary went out that day. The summary below gathers the first run's real findings into the format a daily sweep summary uses.
+
+### The actual messages from the first run
+
+These are two of the real messages the IDS Commander sent the owner on September 29. The text is exactly as sent, with the owner's app name, port, process ID, and backup file name blacked out. The bots still had their original names then: Persistence Hunter is now Startup Monitor, Network Watch is now Network Monitor, File Integrity Monitor is now File Change Monitor, and AI Agent Watchdog is now AI Agent Monitor.
+
+**First findings update, 9:41 AM**
+
+<p align="center">
+  <img src="docs/ids-commander-first-findings.png" alt="The IDS Commander's first findings update to the owner" width="850">
+</p>
+
+**Fix confirmation, 9:45 AM, after the owner approved the fixes**
+
+<p align="center">
+  <img src="docs/ids-commander-fix-confirmed.png" alt="The IDS Commander confirming the approved fixes" width="850">
+</p>
+
+### The summary format
 
 > **🔴 Critical**
 > - None.
