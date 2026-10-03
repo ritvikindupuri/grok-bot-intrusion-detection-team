@@ -157,7 +157,8 @@ Network Monitor watches the computer's network activity. It looks at which progr
 
 #### Schedule
 
-- **Daily sweep.** Network Monitor runs when IDS Commander calls on it during the daily 9:27 AM ET sweep, and whenever the owner asks for a check. It has no separate schedule of its own.
+- **Daily sweep.** Network Monitor runs when IDS Commander calls on it during the daily 9:27 AM ET sweep, and whenever the owner asks for a check.
+- **Its own rechecks.** It also runs its own recheck three times a day, at 9:39 AM, 2:39 PM, and 8:39 PM ET. Each recheck compares the PC with the baseline and reports any change to IDS Commander. If the PC is offline, the recheck is skipped and logged, and nothing is compared.
 - **Follow-ups for teammates.** When another team member flags something with a time attached, Network Monitor checks what was connecting or listening at that time.
 - **Findings go to IDS Commander.** High and Critical findings are sent right away. Everything else goes in the regular report, and IDS Commander decides what reaches the owner.
 
