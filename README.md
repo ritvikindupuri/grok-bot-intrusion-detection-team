@@ -71,7 +71,7 @@ Each agent has its own icon shape and color matched to its role. Red is reserved
 - **Local daily checks.** The Decoy Monitor compares each decoy's SHA-256 hash and last-access time. It runs last in the daily sweep and runs extra checks on demand after an alert.
 - **Last access is a weak signal.** Windows updates last-access times only about once an hour, and background services such as search indexing, antivirus, and file sync can read files on their own. The main signals are Canarytoken alerts and fingerprint changes, and a last-access change on its own is reported with a possible false positive noted. Last-access is ignored entirely for decoys in cloud-synced folders, where the sync client reads them.
 - **Other agents stay away.** Every other agent loads the inventory and skips the decoys. No agent resolves decoy hostnames or URLs or uses decoy keys, and only the Decoy Monitor reads token values.
-- **Cross-checked touches.** When a decoy is touched, the IDS Commander has Process Monitor check which processes were running, Network Monitor check connections and lookups of the canary domains, and Startup Monitor check for new autostart entries around that time.
+- **Cross-checked touches.** When a decoy is touched, the IDS Commander has Process Monitor list which programs that started before the touch are still running (one that already exited won't show up), Network Monitor check connections and lookups of the canary domains, and Startup Monitor check for new autostart entries around that time.
 - **High by default.** Any touch is rated High, with a false-positive assessment attached.
 
 ## Specialist details
@@ -103,7 +103,7 @@ Process Monitor watches the programs running on the computer. It looks for progr
 
 | Severity | Examples |
 |----------|----------|
-| 🟠 High | A Windows system process name running from outside its normal folder, more than one copy of the Windows login process, encoded or hidden PowerShell, an Office app or script host starting a shell, or rundll32 loading a URL or a DLL from a user folder. |
+| 🟠 High | A Windows system process name running from outside its normal folder, more than one copy of the Windows login process, encoded or hidden PowerShell, an Office app, PDF reader, or script host starting a shell, or rundll32 loading a URL or a DLL from a user folder. |
 | 🟠 Medium | Any program running from Temp, Downloads, Public, or the Recycle Bin, a built-in Windows tool attackers misuse (LOLBin) running, or a service host with an unusual parent. For example, an unverified program started from Downloads that unpacked itself into a temporary folder and runs from there. |
 | 🟡 Low | A script running with no window from Downloads that started shortly after login, which points to an autostart entry. |
 | ✅ Info | Well-known benign apps added on the first run, tools the owner confirmed, and the team's own commands. |
@@ -184,7 +184,7 @@ Startup Monitor watches every common way a program can make itself start again a
 
 #### How the baseline and diff work
 
-1. **Detect the operating system.** The first run checks the OS, which is Windows on this PC, and collects everything with read-only PowerShell commands.
+1. **Detect the operating system.** The first run checks the OS and, on Windows, collects everything with read-only PowerShell commands.
 2. **Build the first baseline.** Every entry is normalized into one list and given a stable ID. Each entry records where it lives, what it runs, the resolved program path, the signature and signer, the SHA-256 fingerprint of the program, created and modified times, and a flag if the program lives in an odd place such as Temp, AppData, or Downloads. The baseline is saved on the Grok Bot computer, not on the monitored PC.
 3. **Compare.** Each check collects the same data again and compares it with the baseline by that stable ID, so added, removed, and changed entries stand out. A change in the command, the arguments, the fingerprint, or the signer counts as a change.
 4. **Report only the differences.** Changes get a severity, the evidence, and a note on how likely they are to be false alarms. Entries the owner already confirmed as expected aren't reported again unless they change.
@@ -204,9 +204,9 @@ Its instructions don't define Critical examples, so none are listed. IDS Command
 #### Schedule
 
 - **Daily sweep.** Startup Monitor runs when IDS Commander calls on it during the daily sweep, and whenever the owner asks for a check.
-- **Its own re-scan.** It also runs its own weekly re-scan, on Tuesdays at 9:39 AM ET on the original PC, and reports changes to IDS Commander. An imported copy asks its new owner to pick daily or weekly and a time.
+- **Its own re-scan.** It also runs its own weekly re-scan, on Tuesdays at 11:09 AM ET on the original PC, and reports changes to IDS Commander. An imported copy asks its new owner to pick daily or weekly and a time.
 - **Follow-ups for teammates.** When another team member finds a program that seems to start by itself, Startup Monitor looks for the launch point behind it.
-- **Findings go to IDS Commander.** High and Critical findings are sent right away. Everything else goes in the regular report, and IDS Commander decides what reaches the owner.
+- **Findings go to IDS Commander.** High and Critical findings are sent right away. Everything else is sent to IDS Commander as a non-urgent report. When its own re-scan finds a change, it also sends the owner a short summary.
 
 #### Safeguards
 
@@ -228,11 +228,11 @@ Windows Log Monitor reads the computer's security and system logs. It looks for 
 - **Log clearing.** The Security log or System log being wiped (events 1102 and 104), which is a strong sign someone is hiding activity.
 - **PowerShell.** Script block logging (event 4104) and engine start events (event 400), checked for encoded commands, download-and-run patterns, antivirus bypass strings, and bursts of hidden sessions.
 - **Microsoft Defender.** Detections (events 1116 and 1117), real-time protection being turned off or reconfigured (events 5001, 5004, 5007, 5010, 5012), current protection status, and exclusions added to skip scanning.
-- **Current status.** The monitored PC runs Windows. Everything above is Windows event logging, and only the logs Windows Log Monitor can read today are checked. See Safeguards for the gaps.
+- **Current status.** The team monitors Windows PCs. Only the logs Windows Log Monitor can read are checked. See Safeguards for the gaps.
 
 #### How the baseline and diff work
 
-1. **Detect the operating system.** The first run checks the OS, which is Windows on this PC, and reads the event logs with PowerShell `Get-WinEvent`.
+1. **Detect the operating system.** The first run confirms the OS is Windows and reads the event logs with PowerShell `Get-WinEvent`.
 2. **Build the first baseline.** The first run reviews the previous 24 hours. That shows what routine activity normally looks like on this computer, such as antivirus updates, vendor service installs, and developer tools opening shells.
 3. **Track a checkpoint.** After each run it saves the end time of the window it reviewed on the Grok Bot computer, not on the monitored PC. The next run starts from that checkpoint with a small overlap, so nothing falls through a gap.
 4. **Filter out the team's own activity.** Every IDS agent logs the start time and arguments of each command it runs. Windows Log Monitor matches PowerShell events against those logs, so the team's own scans aren't reported as findings.
@@ -507,19 +507,20 @@ Rooms are group chats where the agents talk to each other. You can read along, b
 Go through the specialists one at a time, in this order: Process Monitor, Network Monitor, Startup Monitor, Windows Log Monitor, File Change Monitor, AI Agent Monitor, then Decoy Monitor. For each one:
 
 1. **Open its chat and answer its setup questions.** Every specialist asks which PC to watch and what to call its IDS lead. Give the same PC as in step 3, and name the IDS Commander as its lead.
-   - Network Monitor, Startup Monitor, and File Change Monitor also ask when to run their own rechecks. File Change Monitor also asks which folders matter most to you.
+   - Network Monitor, Startup Monitor, and File Change Monitor also ask when to run their own rechecks. Network Monitor also asks whether High and Critical findings should come straight to you or only through the IDS Commander. File Change Monitor also asks which folders matter most to you.
+   - AI Agent Monitor also asks which AI agents and tools run on the PC, such as editors, desktop assistants, browser agents, and MCP servers.
    - Decoy Monitor also asks which email should get decoy alerts and whether you want it to propose a starter set of decoys. If it offers its own daily check, you can decline, since the IDS Commander's sweep already covers it.
    - If a specialist asks about decoys before you've set any up, answer "none yet". The Decoy Monitor shares its decoy list later.
    - **Pick recheck times that don't overlap.** Leave at least 30 minutes between each specialist's recheck, and keep them clear of the daily sweep, so only one scan runs at a time.
-2. **Say yes when it asks "Ready for me to take the first baseline?"** No specialist scans until you say so. Say yes to only one specialist at a time, and wait for its summary before you start the next.
+2. **Say yes when it offers to take the first baseline.** No specialist scans until you say so. Say yes to only one specialist at a time, and wait for its summary before you start the next.
 3. **Approve the commands on the PC** as they appear.
 4. **Review what it flags.** Tell it which items are normal for your PC so they're added to the baseline and not reported again.
 
 Then move on to the next specialist. Running them one at a time keeps the approval prompts manageable.
 
-**Give the Windows Log Monitor access to the Security log.** Without admin rights, Windows won't let it read logons and account changes, and it reports those checks as not covered. To fix that, add your Windows account to the built-in Event Log Readers group, then sign out and back in. One way is to run `net localgroup "Event Log Readers" YOUR-USERNAME /add` in an administrator terminal, replacing `YOUR-USERNAME` with your Windows user name.
+**Give the Windows Log Monitor access to the Security log.** Without admin rights, Windows won't let it read logons and account changes, and it reports those checks as not covered. To fix that, add your Windows account to the built-in Event Log Readers group, then sign out and back in. One way is to run `net localgroup "Event Log Readers" YOUR-USERNAME /add` in an administrator terminal, replacing `YOUR-USERNAME` with your Windows user name. To find it, run `whoami` and use the part after the backslash. If you sign in with a Microsoft account, this isn't your email address.
 
-**Decoys come last.** When you're ready, ask the Decoy Monitor for a decoy plan and approve it. Create the Canarytokens it lists on canarytokens.org using your alert email, then enter their values in the Decoy Monitor's masked secret prompt, never in chat. It plants nothing until you approve the exact plan. Once the decoys are in place, tell the other specialists where the Decoy Monitor keeps its decoy list, so their scans skip those files and don't trip them.
+**Decoys come last.** When you're ready, ask the Decoy Monitor for a decoy plan and review it. Create the Canarytokens it lists on canarytokens.org using your alert email, then enter their values in the Decoy Monitor's masked secret prompt, never in chat. Before you approve the plan, ask the Decoy Monitor to share its decoy list with the other specialists, or pause their own rechecks until it has. Otherwise a recheck that runs right after planting can scan a decoy and set off a false alert. It plants nothing until you approve the exact plan. Afterward, it tells you which files are decoys. Don't open them yourself, on the PC or on any device that syncs those folders, because that counts as a touch and sets off an alert.
 
 Once every specialist has a baseline, the team is ready. Go to [How to use it](#how-to-use-it) to see how the daily routine works.
 
@@ -547,7 +548,7 @@ Once setup is done, the team mostly runs itself. Here's what to expect day to da
 
 ### When something is found
 
-4. **Urgent problems don't wait for the summary.** High and Critical findings and any decoy touch reach you right away in the IDS Commander's chat. Network Monitor and File Change Monitor can also message you directly about what their own rechecks find.
+4. **Urgent problems don't wait for the summary.** High and Critical findings and any decoy touch reach you right away in the IDS Commander's chat. Three specialists also message you directly about their own rechecks: Network Monitor about Medium and higher findings, Startup Monitor with a short summary when its re-scan finds a change, and File Change Monitor about High and Critical findings.
 5. **Decide on fixes.** Each proposed fix comes with the exact command and what it does. Tell the IDS Commander which fixes you want. It runs each one as a single command on the PC, and the PC asks you to approve it. A fix that needs admin rights also shows a Windows admin prompt. Afterward, the specialist that found the problem checks again to confirm the fix worked.
 6. **Mark the things that are yours.** If a flagged item is something you installed or expect, tell the IDS Commander. It has the specialist add the item to its baseline so it isn't flagged again.
 
@@ -558,7 +559,7 @@ Once setup is done, the team mostly runs itself. Here's what to expect day to da
 
    Or ask the IDS Commander to pass it along:
    > Have AI Agent Monitor re-check my MCP configs after the extension update.
-8. **If a Canarytokens alert email arrives,** tell the IDS Commander which decoy it names and when it fired. The Decoy Monitor runs an extra check, and Process Monitor, Network Monitor, and Startup Monitor look at what was happening on the PC around that time.
+8. **If a Canarytokens alert email arrives,** tell the IDS Commander the token's memo (the note you typed when you created it) and when it fired. If you opened a decoy yourself, say so, so it isn't treated as an intruder. The Decoy Monitor runs an extra check, Process Monitor lists which programs that started before the touch are still running (one that already exited won't show up), Network Monitor checks connections and lookups of the decoy's domain, and Startup Monitor looks for new autostart entries from around that time. An alert that fires within a few minutes of your cloud-sync app syncing or previewing that folder may be a false alarm, and the Decoy Monitor will say so.
 
 ## Sample findings
 
