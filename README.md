@@ -1,4 +1,4 @@
-# Grok Bot IDS Team
+# GrokHIDS - Multi-Agent Windows Detection & Response
 
 A team of eight Grok Bot agents that watches a Windows PC for signs of intrusion, reports only what changed each day, and fixes problems only after the owner approves each fix.
 
